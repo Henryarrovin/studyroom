@@ -31,18 +31,6 @@ public class FileController {
         return new ResponseEntity<>(filenames, HttpStatus.OK);
     }
 
-//    @GetMapping("/download/{filename}")
-//    public ResponseEntity<byte[]> downloadFiles(@PathVariable("filename") String filename) throws IOException {
-//        File file = fileService.downloadFiles(filename);
-//
-//        Resource resource = new ByteArrayResource(file.getData());
-//        HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.add("File-Name", filename);
-//        httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment;File-Name=" + filename);
-//        return ResponseEntity.ok().contentType(MediaType.parseMediaType(file.getContentType()))
-//                .headers(httpHeaders).body(resource.getContentAsByteArray());
-//    }
-
     @GetMapping("/download/{filename}")
     public ResponseEntity<byte[]> downloadFiles(@PathVariable("filename") String filename) throws IOException {
         File file = fileService.downloadFiles(filename);
