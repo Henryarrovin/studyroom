@@ -20,7 +20,7 @@ public class File {
 
     private String filename;
 
-    @Lob
+    @Column(name = "data", columnDefinition = "BYTEA")
     private byte[] data;
 
     private String contentType;
