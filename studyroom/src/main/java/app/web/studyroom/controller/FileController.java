@@ -16,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/file")
@@ -27,8 +28,13 @@ public class FileController {
 
     @PostMapping("/upload")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ResponseEntity<List<String>> uploadFiles(@RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
-        List<String> filenames = fileService.uploadFiles(multipartFiles);
+    public ResponseEntity<List<String>> uploadFiles(
+            @RequestParam("directory") String directory,
+            @RequestParam("files") List<MultipartFile> multipartFiles) throws IOException {
+        if (multipartFiles.isEmpty() || directory == null || directory.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        List<String> filenames = fileService.uploadFiles(directory ,multipartFiles);
         return new ResponseEntity<>(filenames, HttpStatus.OK);
     }
 
@@ -50,6 +56,27 @@ public class FileController {
                 .contentType(MediaType.parseMediaType(file.getContentType()))
                 .headers(httpHeaders)
                 .body(file.getData());
+    }
+
+    @GetMapping("/all-files")
+    @PreAuthorize("hasAnyAuthority('ADMIN','STUDENT')")
+    public ResponseEntity<Map<String, List<File>>> getAllFiles() {
+        Map<String, List<File>> files = fileService.getAllFiles();
+        return new ResponseEntity<>(files, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-file/{filename}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','STUDENT')")
+    public ResponseEntity<File> getFileByFilename(@PathVariable("filename") String filename) {
+        File file = fileService.getFileByFilename(filename);
+        return new ResponseEntity<>(file, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{filename}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    public ResponseEntity<?> deleteFile(@PathVariable("filename") String filename) {
+        fileService.deleteFile(filename);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }
