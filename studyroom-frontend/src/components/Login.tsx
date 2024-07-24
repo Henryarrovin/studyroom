@@ -1,6 +1,9 @@
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
+import { selectCurrentToken } from "../features/authSlice";
 
 const Login = () => {
   const [username, setUsername] = useState("");
@@ -8,6 +11,13 @@ const Login = () => {
 
   const { error, loading, login } = useAuth();
   const navigate = useNavigate();
+  const token = useSelector((state: RootState) => selectCurrentToken(state));
+
+  useEffect(() => {
+    if (token) {
+      navigate("/home");
+    }
+  }, [token, navigate]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

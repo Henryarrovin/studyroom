@@ -4,7 +4,7 @@ import { RootState } from "../store";
 const authSlice = createSlice({
     name: "auth",
     initialState: {
-        token: null,
+        token: localStorage.getItem('authToken'),
     },
     reducers: {
         setToken: (state, action) => {
