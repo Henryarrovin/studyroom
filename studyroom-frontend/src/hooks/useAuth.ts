@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { loginService, registerService } from '../services/userService';
 import { Login, Register, User } from '../services/userService';
+import { logOut, selectCurrentToken, setToken } from '../features/authSlice';
 
 interface UseAuthResult {
     token: string | null;
@@ -9,10 +11,13 @@ interface UseAuthResult {
     loading: boolean;
     login: (payload: Login) => Promise<void>;
     register: (payload: Register) => Promise<void>;
+    logout: () => void;
 }
 
 const useAuth = (): UseAuthResult => {
-    const [token, setToken] = useState<string | null>(null);
+    const dispatch = useDispatch();
+    const token = useSelector(selectCurrentToken);
+    // const [token, setToken] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -23,7 +28,7 @@ const useAuth = (): UseAuthResult => {
             const response = await loginService.create(payload);
             if (response.status === 200) {
                 const { accessToken } = response.data;
-                setToken(accessToken);
+                dispatch(setToken({ accessToken }));
                 localStorage.setItem('authToken', accessToken);
                 setError(null);
             } else {
@@ -35,7 +40,7 @@ const useAuth = (): UseAuthResult => {
         } finally {
             setLoading(false);
         }
-    }, []);    
+    }, [dispatch]);    
 
 
     // Register is not yet completed !!!
@@ -52,7 +57,12 @@ const useAuth = (): UseAuthResult => {
         }
     }, []);
 
-    return { token, user, error, loading, login, register };
+    const logout = useCallback(() => {
+        dispatch(logOut());
+        localStorage.removeItem('authToken');
+    }, [dispatch]);
+
+    return { token, user, error, loading, login, register, logout };
 };
 
 export default useAuth;
