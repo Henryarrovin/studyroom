@@ -11,7 +11,7 @@ public interface FileService {
 
     List<String> uploadFiles(String directory, List<MultipartFile> multipartFiles) throws IOException;
     File downloadFiles(String filename);
-    Map<String, List<File>> getAllFiles();
+    Map<String, Object> getAllFiles();
     File getFileByFilename(String filename);
     void deleteFile(String filename);
 

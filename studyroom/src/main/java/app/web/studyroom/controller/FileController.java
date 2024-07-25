@@ -12,9 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -43,11 +40,11 @@ public class FileController {
     public ResponseEntity<byte[]> downloadFiles(@PathVariable("filename") String filename) throws IOException {
         File file = fileService.downloadFiles(filename);
 
-        String userHome = System.getProperty("user.home");
-        String downloadsPath = userHome + "/Downloads/";
+//        String userHome = System.getProperty("user.home");
+//        String downloadsPath = userHome + "/Downloads/";
 
-        Path targetPath = Paths.get(downloadsPath + filename);
-        Files.write(targetPath, file.getData());
+//        Path targetPath = Paths.get(downloadsPath + filename);
+//        Files.write(targetPath, file.getData());
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename);
@@ -60,8 +57,8 @@ public class FileController {
 
     @GetMapping("/all-files")
     @PreAuthorize("hasAnyAuthority('ADMIN','STUDENT')")
-    public ResponseEntity<Map<String, List<File>>> getAllFiles() {
-        Map<String, List<File>> files = fileService.getAllFiles();
+    public ResponseEntity<Map<String, Object>> getAllFiles() {
+        Map<String, Object> files = fileService.getAllFiles();
         return new ResponseEntity<>(files, HttpStatus.OK);
     }
 
