@@ -100,7 +100,7 @@ const Home = () => {
         key={file.id}
         className="ml-4 flex items-center justify-between p-2 hover:bg-gray-700 text-white rounded-lg group"
       >
-        {file.filename}
+        📄 {file.filename}
         <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
             onClick={() => handleDownload(file.filename)}
@@ -127,7 +127,7 @@ const Home = () => {
           className="cursor-pointer p-2 hover:bg-gray-700 text-white"
           onClick={() => toggleDirectory(dirName)}
         >
-          {dirName} {isExpanded ? "-" : "+"}
+          📁 {dirName} {isExpanded ? "-" : "+"}
         </div>
         {isExpanded && (
           <ul className="ml-4">
@@ -144,7 +144,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen flex bg-gray-900 text-white">
-      <div className="w-64 bg-gray-800 p-4">
+      <div className="w-64 bg-gray-800 p-4 flex flex-col h-full fixed">
         <h1 className="text-2xl font-bold mb-4">Home</h1>
         <div className="mb-4">
           <button
@@ -188,8 +188,11 @@ const Home = () => {
             About me
           </li>
         </ul>
+        <button className="w-full px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ease-in-out duration-150 mt-auto">
+          Register
+        </button>
       </div>
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-4 ml-64">
         <div className="flex items-center mb-4">
           <input
             type="text"
