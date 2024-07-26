@@ -12,6 +12,10 @@ class HttpService {
         return { request, cancel: () => Controller.abort() };
     }
 
+    getOne<T> (username: string) {
+        return apiClient.get<T>(`${this.endpoint}/${username}`);
+    }
+
     delete (id: number) {
         return apiClient.delete(`${this.endpoint}/${id}`);
     }
@@ -25,6 +29,6 @@ class HttpService {
     }
 }
 
-const create = (endpoint: string) => new HttpService(endpoint);
-
-export default create;
+export const getAll = (endpoint: string) => new HttpService(endpoint);
+export const getOne = (endpoint: string, username: string) => new HttpService(`${endpoint}/${username}`);
+export const create = (endpoint: string) => new HttpService(endpoint);

@@ -1,8 +1,6 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-import deleteIcon from "../assets/delete.png";
-import downloadIcon from "../assets/download.png";
+import { useState } from "react";
+import downloadIcon from "../../../assets/download.png";
+import deleteIcon from "../../../assets/delete.png";
 
 const directories: any = {
   text: {
@@ -51,20 +49,11 @@ const directories: any = {
   },
 };
 
-const Home = () => {
-  const navigate = useNavigate();
-  const { logout } = useAuth();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
-
+const FilesPage = () => {
   const [expandedDirs, setExpandedDirs] = useState<{ [key: string]: boolean }>(
     {}
   );
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedSection, setSelectedSection] = useState<string | null>(null);
 
   const toggleDirectory = (dir: string) => {
     setExpandedDirs((prevState) => ({
@@ -143,77 +132,23 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-900 text-white">
-      <div className="w-64 bg-gray-800 p-4 flex flex-col h-full fixed">
-        <h1 className="text-2xl font-bold mb-4">Home</h1>
-        <div className="mb-4">
-          <button
-            onClick={handleLogout}
-            className="w-full px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ease-in-out duration-150"
-          >
-            Log Out
-          </button>
-        </div>
-        <ul>
-          <li
-            className={`cursor-pointer p-2 hover:bg-gray-700 ${
-              selectedSection === "SharedFiles" ? "bg-gray-700" : ""
-            }`}
-            onClick={() => setSelectedSection("SharedFiles")}
-          >
-            Shared Files
-          </li>
-          <li
-            className={`cursor-pointer p-2 hover:bg-gray-700 ${
-              selectedSection === "Upload" ? "bg-gray-700" : ""
-            }`}
-            onClick={() => setSelectedSection("Upload")}
-          >
-            Upload
-          </li>
-          <li
-            className={`cursor-pointer p-2 hover:bg-gray-700 ${
-              selectedSection === "Users" ? "bg-gray-700" : ""
-            }`}
-            onClick={() => setSelectedSection("Users")}
-          >
-            Users
-          </li>
-          <li
-            className={`cursor-pointer p-2 hover:bg-gray-700 ${
-              selectedSection === "AboutMe" ? "bg-gray-700" : ""
-            }`}
-            onClick={() => setSelectedSection("AboutMe")}
-          >
-            About me
-          </li>
-        </ul>
-        <button className="w-full px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ease-in-out duration-150 mt-auto">
-          Register
-        </button>
+    <div>
+      <div className="flex items-center mb-4">
+        <input
+          type="text"
+          placeholder="Enter search term"
+          value={searchTerm}
+          onChange={handleSearchChange}
+          className="w-full p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        />
       </div>
-      <div className="flex-1 p-4 ml-64">
-        <div className="flex items-center mb-4">
-          <input
-            type="text"
-            placeholder="Enter search term"
-            value={searchTerm}
-            onChange={handleSearchChange}
-            className="w-full p-2 bg-gray-700 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-          />
-        </div>
-        <div>
-          {selectedSection === "SharedFiles" &&
-            Object.keys(directories).map((dirName) =>
-              renderDirectory(directories[dirName], dirName)
-            )}
-          {selectedSection === "Upload" && <div>Upload</div>}
-          {selectedSection === "Users" && <div>Users</div>}
-          {selectedSection === "AboutMe" && <div>About me</div>}
-        </div>
+      <div>
+        {Object.keys(directories).map((dirName) =>
+          renderDirectory(directories[dirName], dirName)
+        )}
       </div>
     </div>
   );
 };
 
-export default Home;
+export default FilesPage;

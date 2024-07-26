@@ -1,4 +1,4 @@
-import create from "./HttpService";
+import { create, getAll, getOne } from "./HttpService";
 
 export interface User {
     id: number;
@@ -28,5 +28,7 @@ export interface Register {
 
 const loginService = create("/users/login");
 const registerService = create("/users/register");
+const getAllUsersService = getAll("/users/get-all-user");
+const getUserByUsernameService = (username: string) => getOne("/users/get-user-by-username", username);
 
-export { loginService, registerService };
+export { loginService, registerService, getAllUsersService, getUserByUsernameService };
