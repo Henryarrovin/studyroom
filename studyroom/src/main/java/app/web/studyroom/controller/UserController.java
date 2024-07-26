@@ -66,7 +66,7 @@ public class UserController {
     }
 
     @GetMapping("/get-all-user")
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'STUDENT')")
     public ResponseEntity<Iterable<UserDto>> getAllUsers() {
         Iterable<User> users = userService.getAllUser();
         List<UserDto> userDto = new ArrayList<>();
@@ -94,4 +94,12 @@ public class UserController {
         userService.deleteUser(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/get-user-by-username/{username}")
+    @PreAuthorize("hasAnyAuthority('ADMIN','STUDENT')")
+    public ResponseEntity<UserDto> getUserByUsername(@PathVariable String username) {
+        User user = userService.getUserByUsername(username);
+        return new ResponseEntity<>(userMapper.mapTo(user), HttpStatus.OK);
+    }
+
 }

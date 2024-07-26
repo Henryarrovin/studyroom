@@ -19,6 +19,8 @@ public interface UserService {
 
     void deleteUser(Long id);
 
+    User getUserByUsername(String username);
+
     boolean existsByUsername(String username);
 
     boolean isExists(Long id);
