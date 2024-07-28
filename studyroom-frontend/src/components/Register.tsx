@@ -1,21 +1,28 @@
+import { useNavigate } from "react-router-dom";
+
 const Register = () => {
+  const navigate = useNavigate();
+  const handleRegister = () => {
+    // Register a new member
+    navigate("/home");
+  };
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8 bg-gray-800">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img
           className="mx-auto h-30 w-auto"
-          src="../src/assets/studyroom.jpg"
+          src="../src/assets/studyroom-without-bg.png"
           alt="Your Company"
         />
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
           Register a new member
         </h2>
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleRegister}>
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900">
+            <label className="block text-sm font-medium leading-6 text-white">
               First Name
             </label>
             <div className="mt-2">
@@ -29,7 +36,7 @@ const Register = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900">
+            <label className="block text-sm font-medium leading-6 text-white">
               Last Name
             </label>
             <div className="mt-2">
@@ -43,7 +50,7 @@ const Register = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900">
+            <label className="block text-sm font-medium leading-6 text-white">
               Email
             </label>
             <div className="mt-2">
@@ -57,7 +64,7 @@ const Register = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900">
+            <label className="block text-sm font-medium leading-6 text-white">
               DOB
             </label>
             <div className="mt-2">
@@ -71,7 +78,7 @@ const Register = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900">
+            <label className="block text-sm font-medium leading-6 text-white">
               Username
             </label>
             <div className="mt-2">
@@ -87,7 +94,7 @@ const Register = () => {
 
           <div>
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium leading-6 text-gray-900">
+              <label className="block text-sm font-medium leading-6 text-white">
                 Password
               </label>
             </div>
@@ -103,7 +110,7 @@ const Register = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900">
+            <label className="block text-sm font-medium leading-6 text-white">
               Roles
             </label>
             <div className="mt-2">

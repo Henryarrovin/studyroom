@@ -4,18 +4,22 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
 import { selectCurrentToken } from "../features/authSlice";
+import useUserData from "../hooks/useUserData";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const { error, loading, login } = useAuth();
+  const { submitUserInput } = useUserData();
   const navigate = useNavigate();
   const token = useSelector((state: RootState) => selectCurrentToken(state));
 
   useEffect(() => {
     if (token) {
       navigate("/home");
+    } else if (token === null) {
+      navigate("/");
     }
   }, [token, navigate]);
 
@@ -23,6 +27,7 @@ const Login = () => {
     event.preventDefault();
     try {
       await login({ username, password });
+      await submitUserInput(username);
       navigate("/home");
     } catch (error) {
       console.error("Failed to log in:", error);

@@ -15,6 +15,10 @@ const Home = () => {
     navigate("/");
   };
 
+  const handleRegister = () => {
+    navigate("/register");
+  };
+
   const [selectedSection, setSelectedSection] = useState<string>("SharedFiles");
 
   return (
@@ -63,7 +67,10 @@ const Home = () => {
             About me
           </li>
         </ul>
-        <button className="w-full px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ease-in-out duration-150 mt-auto">
+        <button
+          className="w-full px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ease-in-out duration-150 mt-auto"
+          onClick={handleRegister}
+        >
           Register
         </button>
       </div>

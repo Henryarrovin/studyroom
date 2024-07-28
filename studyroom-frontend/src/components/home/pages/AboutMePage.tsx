@@ -1,16 +1,19 @@
-const data: any = {
-  id: 1,
-  firstName: "Henry",
-  lastName: "Arrovin",
-  email: "hen@gmail.com",
-  dateOfBirth: [2003, 6, 20],
-  username: "hen",
-  password: "",
-  roles: ["Role(id=1, name=ADMIN)"],
-};
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../../../features/userSlice";
+import { RootState } from "../../../store";
 
 const AboutMePage = () => {
-  const { firstName, lastName, email, dateOfBirth, username, roles } = data;
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+
+  const { firstName, lastName, email, dateOfBirth, username, roles } = user;
+
+  const roleNames = roles
+    .map((role: string) => {
+      const match = role.match(/name=([A-Z]+)/);
+      return match ? match[1] : null;
+    })
+    .filter((role: string | null) => role !== null)
+    .join(", ");
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
@@ -30,8 +33,7 @@ const AboutMePage = () => {
           {dateOfBirth.join("-")}
         </p>
         <p className="mb-2">
-          <span className="font-semibold">Roles:</span>{" "}
-          {roles.map((role: any) => role.match(/name=([A-Z]+)/)[1]).join(", ")}
+          <span className="font-semibold">Roles:</span> {roleNames}
         </p>
       </div>
     </div>

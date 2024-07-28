@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { loginService, registerService } from '../services/userService';
 import { Login, Register, User } from '../services/userService';
 import { logOut, selectCurrentToken, setToken } from '../features/authSlice';
+import { removeUser } from '../features/userSlice';
 
 interface UseAuthResult {
     token: string | null;
@@ -59,7 +60,9 @@ const useAuth = (): UseAuthResult => {
 
     const logout = useCallback(() => {
         dispatch(logOut());
+        dispatch(removeUser());
         localStorage.removeItem('authToken');
+        localStorage.removeItem('username');
     }, [dispatch]);
 
     return { token, user, error, loading, login, register, logout };

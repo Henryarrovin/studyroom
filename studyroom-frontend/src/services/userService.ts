@@ -1,11 +1,11 @@
-import { create, getAll, getOne } from "./HttpService";
+import { create, getAll, getUserByUsername } from "./HttpService";
 
 export interface User {
     id: number;
     firstName: string;
     lastName: string;
     email: string;
-    dateOfBirth: string;
+    dateOfBirth: number[];
     username: string;
     password: string;
     roles: string[];
@@ -20,7 +20,7 @@ export interface Register {
     firstName: string;
     lastName: string;
     email: string;
-    dateOfBirth: string;
+    dateOfBirth: number[];
     username: string;
     password: string;
     roles: string[];
@@ -29,6 +29,6 @@ export interface Register {
 const loginService = create("/users/login");
 const registerService = create("/users/register");
 const getAllUsersService = getAll("/users/get-all-user");
-const getUserByUsernameService = (username: string) => getOne("/users/get-user-by-username", username);
+const getUserByUsernameService = getUserByUsername("/users/get-user-by-username");
 
 export { loginService, registerService, getAllUsersService, getUserByUsernameService };
