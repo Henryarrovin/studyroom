@@ -43,14 +43,14 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div className="flex min-h-screen flex-col justify-center px-6 py-12 lg:px-8 bg-gray-800">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <img
           className="mx-auto h-30 w-auto"
-          src="../src/assets/studyroom.jpg"
+          src="../src/assets/studyroom-without-bg.png"
           alt="Your Company"
         />
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-white">
           Login to your account
         </h2>
       </div>
@@ -58,14 +58,14 @@ const Login = () => {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label className="block text-sm font-medium leading-6 text-gray-900">
+            <label className="block text-sm font-medium leading-6 text-white">
               Username
             </label>
             <div className="mt-2">
               <input
                 id="username"
                 name="username"
-                type="username"
+                type="text"
                 value={username}
                 onChange={handleUsernameChange}
                 required
@@ -76,7 +76,7 @@ const Login = () => {
 
           <div>
             <div className="flex items-center justify-between">
-              <label className="block text-sm font-medium leading-6 text-gray-900">
+              <label className="block text-sm font-medium leading-6 text-white">
                 Password
               </label>
             </div>
