@@ -1,59 +1,41 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import downloadIcon from "../../../assets/download.png";
 import deleteIcon from "../../../assets/delete.png";
-
-const directories: any = {
-  text: {
-    new: {
-      files: [
-        { id: 7, filename: "Hello world.txt", directory: "/text/new" },
-        { id: 9, filename: "Hello world (1).txt", directory: "/text/new" },
-        { id: 10, filename: "Hello world (2).txt", directory: "/text/new" },
-      ],
-    },
-    new2: {
-      files: [{ id: 11, filename: "Hello world.txt", directory: "/text/new2" }],
-    },
-    files: [
-      { id: 5, filename: "Hello world.txt", directory: "/text" },
-      { id: 6, filename: "Hello world (1).txt", directory: "/text" },
-    ],
-  },
-  javascript: {
-    files: [
-      { id: 4, filename: "index.js", directory: "/javascript" },
-      { id: 8, filename: "Hello world.txt", directory: "/javascript" },
-    ],
-  },
-  text1: {
-    new: {
-      files: [
-        { id: 7, filename: "Hello world.txt", directory: "/text/new" },
-        { id: 9, filename: "Hello world (1).txt", directory: "/text/new" },
-        { id: 10, filename: "Hello world (2).txt", directory: "/text/new" },
-      ],
-    },
-    new2: {
-      files: [{ id: 11, filename: "Hello world.txt", directory: "/text/new2" }],
-    },
-    files: [
-      { id: 5, filename: "Hello world.txt", directory: "/text" },
-      { id: 6, filename: "Hello world (1).txt", directory: "/text" },
-    ],
-  },
-  javascript1: {
-    files: [
-      { id: 4, filename: "index.js", directory: "/javascript" },
-      { id: 8, filename: "Hello world.txt", directory: "/javascript" },
-    ],
-  },
-};
+import apiClient from "../../../services/apiClient";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
+import { selectCurrentUser } from "../../../features/userSlice";
 
 const FilesPage = () => {
   const [expandedDirs, setExpandedDirs] = useState<{ [key: string]: boolean }>(
     {}
   );
   const [searchTerm, setSearchTerm] = useState("");
+  const [fileSystemData, setFileSystemDataState] = useState<any>(null);
+
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+
+  const { roles } = user;
+  const roleNames = roles
+    .map((role: string) => {
+      const match = role.match(/name=([A-Z]+)/);
+      return match ? match[1] : null;
+    })
+    .filter((role: string | null) => role !== null)
+    .join(", ");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await apiClient.get("/file/all-files");
+        setFileSystemDataState(response.data);
+      } catch (error) {
+        console.error("Failed to fetch filesystem data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const toggleDirectory = (dir: string) => {
     setExpandedDirs((prevState) => ({
@@ -72,14 +54,64 @@ const FilesPage = () => {
     );
   };
 
-  const handleDelete = (fileId: number) => {
-    // Implement delete functionality here
-    console.log(`Delete file with ID: ${fileId}`);
+  const handleDelete = (directory: string, fileName: string) => {
+    const trimmedDirectory = directory.trim();
+    const trimmedFileName = fileName.trim();
+
+    const encodedFileName = encodeURIComponent(trimmedFileName);
+    const encodedDirectory = encodeURIComponent(trimmedDirectory);
+
+    const url = `/file/delete?directory=${encodedDirectory}&filename=${encodedFileName}`;
+
+    if (roleNames === "ADMIN") {
+      apiClient
+        .delete(url)
+        .then(() => {
+          window.alert("File deleted successfully.");
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Error deleting file:", error);
+        });
+    } else {
+      window.alert("You do not have permission to delete files.");
+    }
   };
 
-  const handleDownload = (fileId: number) => {
-    // Implement download functionality here
-    console.log(`Download file with ID: ${fileId}`);
+  const handleDownload = (directory: string, fileName: string) => {
+    const encodedDirectory = encodeURIComponent(directory);
+    const encodedFileName = encodeURIComponent(fileName);
+
+    const requestUrl = `/file/download?directory=${encodedDirectory}&filename=${encodedFileName}`;
+
+    apiClient
+      .get(requestUrl, { responseType: "blob" })
+      .then((response) => {
+        const blob = new Blob([response.data], {
+          type: response.headers["content-type"] || "application/octet-stream",
+        });
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+
+        const contentDisposition = response.headers["content-disposition"];
+        const downloadFileName = contentDisposition
+          ? contentDisposition
+              .split("filename=")[1]
+              .split(";")[0]
+              .replace(/"/g, "")
+          : fileName;
+
+        link.href = url;
+        link.setAttribute("download", downloadFileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+      });
   };
 
   const renderFiles = (files: any[]) => {
@@ -92,13 +124,13 @@ const FilesPage = () => {
         📄 {file.filename}
         <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
           <button
-            onClick={() => handleDownload(file.filename)}
+            onClick={() => handleDownload(file.directory, file.filename)}
             className="p-1 hover:bg-gray-600 rounded-full"
           >
             <img src={downloadIcon} alt="Download" className="w-4 h-4" />
           </button>
           <button
-            onClick={() => handleDelete(file.filename)}
+            onClick={() => handleDelete(file.directory, file.filename)}
             className="p-1 hover:bg-gray-600 rounded-full"
           >
             <img src={deleteIcon} alt="Delete" className="w-4 h-4" />
@@ -143,9 +175,10 @@ const FilesPage = () => {
         />
       </div>
       <div>
-        {Object.keys(directories).map((dirName) =>
-          renderDirectory(directories[dirName], dirName)
-        )}
+        {fileSystemData &&
+          Object.keys(fileSystemData).map((dirName) =>
+            renderDirectory(fileSystemData[dirName], dirName)
+          )}
       </div>
     </div>
   );

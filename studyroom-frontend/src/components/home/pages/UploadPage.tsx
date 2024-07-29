@@ -1,57 +1,25 @@
-import { useState } from "react";
-
-const directories: any = {
-  text: {
-    new: {
-      files: [
-        { id: 7, filename: "Hello world.txt", directory: "/text/new" },
-        { id: 9, filename: "Hello world (1).txt", directory: "/text/new" },
-        { id: 10, filename: "Hello world (2).txt", directory: "/text/new" },
-      ],
-    },
-    new2: {
-      files: [{ id: 11, filename: "Hello world.txt", directory: "/text/new2" }],
-    },
-    files: [
-      { id: 5, filename: "Hello world.txt", directory: "/text" },
-      { id: 6, filename: "Hello world (1).txt", directory: "/text" },
-    ],
-  },
-  javascript: {
-    files: [
-      { id: 4, filename: "index.js", directory: "/javascript" },
-      { id: 8, filename: "Hello world.txt", directory: "/javascript" },
-    ],
-  },
-  text1: {
-    new: {
-      files: [
-        { id: 7, filename: "Hello world.txt", directory: "/text/new" },
-        { id: 9, filename: "Hello world (1).txt", directory: "/text/new" },
-        { id: 10, filename: "Hello world (2).txt", directory: "/text/new" },
-      ],
-    },
-    new2: {
-      files: [{ id: 11, filename: "Hello world.txt", directory: "/text/new2" }],
-    },
-    files: [
-      { id: 5, filename: "Hello world.txt", directory: "/text" },
-      { id: 6, filename: "Hello world (1).txt", directory: "/text" },
-    ],
-  },
-  javascript1: {
-    files: [
-      { id: 4, filename: "index.js", directory: "/javascript" },
-      { id: 8, filename: "Hello world.txt", directory: "/javascript" },
-    ],
-  },
-};
+import { useEffect, useState } from "react";
+import apiClient from "../../../services/apiClient";
 
 const UploadPage = () => {
+  const [fileSystemData, setFileSystemDataState] = useState<any>(null);
   const [selectedDirectory, setSelectedDirectory] = useState("");
   const [newDirectoryName, setNewDirectoryName] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await apiClient.get("/file/all-files");
+        setFileSystemDataState(response.data);
+      } catch (error) {
+        console.error("Failed to fetch filesystem data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -61,16 +29,49 @@ const UploadPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    validateNewDirectoryName();
-    console.log(files);
+    if (!validateNewDirectoryName()) return;
+
+    const directory = selectedDirectory || newDirectoryName;
+    if (!directory.trim()) {
+      setError("Please select or enter a directory.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("directory", directory);
+
+    files.forEach((file) => {
+      formData.append("files", file);
+    });
+
+    try {
+      const response = await apiClient.post("/file/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Files uploaded successfully:", response.data);
+      setFiles([]);
+      setNewDirectoryName("");
+      setSelectedDirectory("");
+      setError("");
+      window.alert("Files uploaded successfully.");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error uploading files:", error);
+      window.alert("Failed to upload files.");
+      setError("Failed to upload files.");
+    }
   };
 
   const handleDirectoryChange = (directory: string) => {
     setSelectedDirectory(directory);
+    setNewDirectoryName("");
   };
 
   const validateNewDirectoryName = () => {
-    const allDirectories = collectDirectories(directories);
+    const allDirectories = collectDirectories(fileSystemData);
     console.log(newDirectoryName);
 
     if (allDirectories.includes(`${newDirectoryName}`)) {
@@ -82,6 +83,8 @@ const UploadPage = () => {
   };
 
   const collectDirectories = (obj: any, path = ""): string[] => {
+    if (!obj) return [];
+
     let paths: string[] = [];
 
     Object.keys(obj).forEach((key) => {
@@ -97,7 +100,7 @@ const UploadPage = () => {
     return paths;
   };
 
-  const directoryOptions = collectDirectories(directories).map((dir) => (
+  const directoryOptions = collectDirectories(fileSystemData).map((dir) => (
     <option value={dir} key={dir}>
       {dir}
     </option>
@@ -140,7 +143,7 @@ const UploadPage = () => {
               type="text"
               value={newDirectoryName}
               onChange={(e) => setNewDirectoryName(e.target.value)}
-              placeholder="Start with / to create a new directory"
+              placeholder="Enter new directory name"
               className="appearance-none block w-full bg-gray-200 text-gray-700 border rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white"
               disabled={isTextDisabled}
               required

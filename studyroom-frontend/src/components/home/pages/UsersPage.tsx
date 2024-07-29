@@ -1,38 +1,30 @@
-import { useState } from "react";
-
-const data: any = [
-  {
-    id: 1,
-    firstName: "Henry",
-    lastName: "Arrovin",
-    email: "hen@gmail.com",
-    dateOfBirth: [2003, 6, 20],
-    username: "hen",
-    password: "",
-    roles: ["Role(id=1, name=ADMIN)"],
-  },
-  {
-    id: 2,
-    firstName: "abc",
-    lastName: "abc",
-    email: "abc@gmail.com",
-    dateOfBirth: [2003, 6, 20],
-    username: "abc",
-    password: "",
-    roles: ["Role(id=2, name=STUDENT)"],
-  },
-];
+import { useEffect, useState } from "react";
+import apiClient from "../../../services/apiClient";
 
 const UsersPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [userData, setUserData] = useState<any>([]);
 
   const handleSearchChange = (e: any) => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredUsers = data.filter((user: any) =>
+  const filteredUsers = userData.filter((user: any) =>
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await apiClient.get("/users/get-all-user");
+        setUserData(response.data);
+      } catch (error) {
+        console.error("Failed to fetch user data:", error);
+      }
+    };
+
+    fetchData();
+  });
 
   return (
     <div className="min-h-screen flex flex-col">

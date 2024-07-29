@@ -35,10 +35,13 @@ public class FileController {
         return new ResponseEntity<>(filenames, HttpStatus.OK);
     }
 
-    @GetMapping("/download/{filename}")
+    @GetMapping("/download")
     @PreAuthorize("hasAnyAuthority('ADMIN','STUDENT')")
-    public ResponseEntity<byte[]> downloadFiles(@PathVariable("filename") String filename) throws IOException {
-        File file = fileService.downloadFiles(filename);
+    public ResponseEntity<byte[]> downloadFiles(
+            @RequestParam("directory") String directory,
+            @RequestParam("filename") String filename
+    ) throws IOException {
+        File file = fileService.downloadFiles(directory, filename);
 
 //        String userHome = System.getProperty("user.home");
 //        String downloadsPath = userHome + "/Downloads/";
@@ -69,10 +72,13 @@ public class FileController {
         return new ResponseEntity<>(file, HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{filename}")
+    @DeleteMapping("/delete")
     @PreAuthorize("hasAnyAuthority('ADMIN')")
-    public ResponseEntity<?> deleteFile(@PathVariable("filename") String filename) {
-        fileService.deleteFile(filename);
+    public ResponseEntity<?> deleteFile(
+            @RequestParam("directory") String directory,
+            @RequestParam("filename") String filename
+    ) {
+        fileService.deleteFile(directory, filename);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

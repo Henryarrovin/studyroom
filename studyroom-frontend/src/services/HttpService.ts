@@ -31,6 +31,10 @@ class HttpService {
 
 export const getAll = (endpoint: string) => new HttpService(endpoint);
 export const create = (endpoint: string) => new HttpService(endpoint);
+export const downloadFile = (endpoint: string) => {
+    const service = new HttpService(endpoint);
+    return (filename: string) => service.getOne(filename);
+};
 export const getUserByUsername = (endpoint: string) => {
     const service = new HttpService(endpoint);
     return (username: string) => service.getOne(username);

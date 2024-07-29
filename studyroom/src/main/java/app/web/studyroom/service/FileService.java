@@ -10,9 +10,9 @@ import java.util.Map;
 public interface FileService {
 
     List<String> uploadFiles(String directory, List<MultipartFile> multipartFiles) throws IOException;
-    File downloadFiles(String filename);
+    File downloadFiles(String directory, String filename);
     Map<String, Object> getAllFiles();
     File getFileByFilename(String filename);
-    void deleteFile(String filename);
+    void deleteFile(String directory, String filename);
 
 }

@@ -45,9 +45,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public File downloadFiles(String filename) {
-        return fileRepository.findByFilename(filename)
-                .orElseThrow(() -> new RuntimeException(filename + " was not found on the server"));
+    public File downloadFiles(String directory, String filename) {
+        return fileRepository.findByDirectoryAndFilename(directory, filename)
+                .orElseThrow(() -> new RuntimeException(directory + "/" + filename + " was not found on the server"));
     }
 
     @Override
@@ -83,9 +83,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void deleteFile(String filename) {
-        File file = fileRepository.findByFilename(filename)
-                .orElseThrow(() -> new RuntimeException(filename + " was not found on the server"));
+    public void deleteFile(String directory, String filename) {
+        File file = fileRepository.findByDirectoryAndFilename(directory, filename)
+                .orElseThrow(() -> new RuntimeException(directory + "/" + filename + " was not found on the server"));
         fileRepository.delete(file);
     }
 
