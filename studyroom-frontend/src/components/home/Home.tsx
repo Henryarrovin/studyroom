@@ -5,10 +5,24 @@ import Upload from "./pages/UploadPage";
 import UsersPage from "./pages/UsersPage";
 import AboutMePage from "./pages/AboutMePage";
 import FilesPage from "./pages/FilesPage";
+import { RootState } from "../../store";
+import { useSelector } from "react-redux";
+import { selectCurrentUser } from "../../features/userSlice";
 
 const Home = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
+
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+
+  const { roles } = user;
+  const roleNames = roles
+    .map((role: string) => {
+      const match = role.match(/name=([A-Z]+)/);
+      return match ? match[1] : null;
+    })
+    .filter((role: string | null) => role !== null)
+    .join(", ");
 
   const handleLogout = () => {
     logout();
@@ -16,7 +30,11 @@ const Home = () => {
   };
 
   const handleRegister = () => {
-    navigate("/register");
+    if (roleNames === "ADMIN") {
+      navigate("/register");
+    } else {
+      window.alert("You do not have permission to register new users.");
+    }
   };
 
   const [selectedSection, setSelectedSection] = useState<string>("SharedFiles");

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
 import apiClient from "../../../services/apiClient";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
+import { selectCurrentUser } from "../../../features/userSlice";
 
 const UploadPage = () => {
   const [fileSystemData, setFileSystemDataState] = useState<any>(null);
@@ -7,6 +10,16 @@ const UploadPage = () => {
   const [newDirectoryName, setNewDirectoryName] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState("");
+
+  const user = useSelector((state: RootState) => selectCurrentUser(state));
+  const { roles } = user;
+  const roleNames = roles
+    .map((role: string) => {
+      const match = role.match(/name=([A-Z]+)/);
+      return match ? match[1] : null;
+    })
+    .filter((role: string | null) => role !== null)
+    .join(", ");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -165,9 +178,10 @@ const UploadPage = () => {
         </div>
         <button
           type="submit"
+          disabled={roleNames !== "ADMIN"}
           className="w-full px-4 py-2 bg-indigo-500 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-400 transition ease-in-out duration-150 mt-4"
         >
-          Upload
+          {roleNames === "ADMIN" ? "Upload" : "Disabled for non-admin users"}
         </button>
       </form>
     </div>

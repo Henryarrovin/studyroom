@@ -20,14 +20,14 @@ export interface Register {
     firstName: string;
     lastName: string;
     email: string;
-    dateOfBirth: number[];
+    dateOfBirth: string;
     username: string;
     password: string;
     roles: string[];
 }
 
 const loginService = create("/users/login");
-const registerService = create("/users/register");
+const registerService = create("/users/create-user");
 const getAllUsersService = getAll("/users/get-all-user");
 const getUserByUsernameService = getUserByUsername("/users/get-user-by-username");
 

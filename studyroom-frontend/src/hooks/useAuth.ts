@@ -18,7 +18,6 @@ interface UseAuthResult {
 const useAuth = (): UseAuthResult => {
     const dispatch = useDispatch();
     const token = useSelector(selectCurrentToken);
-    // const [token, setToken] = useState<string | null>(null);
     const [user, setUser] = useState<User | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -44,7 +43,6 @@ const useAuth = (): UseAuthResult => {
     }, [dispatch]);    
 
 
-    // Register is not yet completed !!!
     const register = useCallback(async (payload: Register): Promise<void> => {
         setLoading(true);
         try {
@@ -53,6 +51,7 @@ const useAuth = (): UseAuthResult => {
             setError(null);
         } catch (err: any) {
             setError(err.message || 'Registration failed');
+            throw err;
         } finally {
             setLoading(false);
         }
