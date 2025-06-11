@@ -2,7 +2,6 @@ package app.web.studyroom.security;
 
 import app.web.studyroom.model.Role;
 import app.web.studyroom.model.User;
-import app.web.studyroom.repository.RoleRepository;
 import app.web.studyroom.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -23,7 +22,7 @@ public class JwtTokenProvider {
     private final UserRepository userRepository;
     private final SecretKey key;
 
-    public JwtTokenProvider(RoleRepository roleRepository, UserRepository userRepository, SecretKey key) {
+    public JwtTokenProvider(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SecurityConstants.JWT_SECRET));
     }

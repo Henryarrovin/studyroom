@@ -24,7 +24,7 @@ const UsersPage = () => {
     };
 
     fetchData();
-  });
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -49,7 +49,17 @@ const UsersPage = () => {
                   Name: {user.firstName} {user.lastName}
                 </p>
                 <p>Email: {user.email}</p>
-                <p>Date of Birth: {user.dateOfBirth.join("-")}</p>
+                {/* <p>Date of Birth: {user.dateOfBirth.join("-")}</p> */}
+                <p>Date of Birth: {
+                    Array.isArray(user.dateOfBirth)
+                      ? user.dateOfBirth.join("-")
+                      : new Date(user.dateOfBirth).toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric"
+                        })
+                  }
+                </p>
               </div>
             </div>
           </li>
