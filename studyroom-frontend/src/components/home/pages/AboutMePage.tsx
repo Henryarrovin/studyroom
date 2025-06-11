@@ -30,7 +30,12 @@ const AboutMePage = () => {
         </p>
         <p className="mb-2">
           <span className="font-semibold">Date of Birth:</span>{" "}
-          {dateOfBirth.join("-")}
+          {/* {dateOfBirth.join("-")} */}
+          {new Date(dateOfBirth[0], dateOfBirth[1] - 1, dateOfBirth[2]).toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric"
+          })}
         </p>
         <p className="mb-2">
           <span className="font-semibold">Roles:</span> {roleNames}
