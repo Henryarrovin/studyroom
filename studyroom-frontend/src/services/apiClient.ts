@@ -3,8 +3,8 @@ import { RootState, store } from '../store';
 import { logOut, selectCurrentToken } from '../features/authSlice';
 
 const apiClient = axios.create({
-    baseURL: 'https://studyroom-app-latest.onrender.com',
-    // baseURL: 'http://localhost:8090',
+    // baseURL: 'https://studyroom-app-latest.onrender.com',
+    baseURL: 'http://localhost:8080',
     headers: {
         'Content-Type': 'application/json',
     },

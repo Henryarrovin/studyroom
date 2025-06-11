@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Service
 public class JwtUserDetailsService implements UserDetailsService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public JwtUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;

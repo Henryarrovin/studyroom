@@ -7,19 +7,25 @@ import app.web.studyroom.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.List;
 
 @Component
 public class JwtTokenProvider {
 
-    private UserRepository userRepository;
-    public JwtTokenProvider(RoleRepository roleRepository, UserRepository userRepository) {
+    private final UserRepository userRepository;
+    private final SecretKey key;
+
+    public JwtTokenProvider(RoleRepository roleRepository, UserRepository userRepository, SecretKey key) {
         this.userRepository = userRepository;
+        this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(SecurityConstants.JWT_SECRET));
     }
 
     public String generateToken(Authentication authentication) {
@@ -29,42 +35,45 @@ public class JwtTokenProvider {
 
         List<Role> roles = user.getRoles();
 
-        Role role = roles.isEmpty() ? null : roles.get(0);
+        Role role = roles.isEmpty() ? null : roles.getFirst();
         if (role == null) {
             throw new IllegalStateException("User role not found");
         }
         Date currentDate = new Date();
         Date expiryDate = new Date(currentDate.getTime() + SecurityConstants.JWT_EXPIRATION);
-        String token = Jwts.builder()
+
+        return Jwts.builder()
                 .setSubject(username)
                 .claim("role", role.getName())
                 .setIssuedAt(currentDate)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS512, SecurityConstants.JWT_SECRET)
+                .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
-        return token;
     }
 
 
     public String getUsernameFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(SecurityConstants.JWT_SECRET)
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+//        Claims claims = Jwts.parser()
+//                .setSigningKey(SecurityConstants.JWT_SECRET)
+//                .parseClaimsJws(token)
+//                .getBody();
+//        return claims.getSubject();
+        return parseClaims(token).getSubject();
     }
 
     public String getRoleFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(SecurityConstants.JWT_SECRET)
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.get("role", String.class);
+//        Claims claims = Jwts.parser()
+//                .setSigningKey(SecurityConstants.JWT_SECRET)
+//                .parseClaimsJws(token)
+//                .getBody();
+//        return claims.get("role", String.class);
+        return parseClaims(token).get("role", String.class);
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parser().setSigningKey(SecurityConstants.JWT_SECRET).parseClaimsJws(token);
+//            Jwts.parser().setSigningKey(SecurityConstants.JWT_SECRET).parseClaimsJws(token);
+            parseClaims(token);
             return true;
         } catch (Exception e) {
             System.out.println("---------------------------------------ERROR---------------------------------------");
@@ -72,6 +81,14 @@ public class JwtTokenProvider {
             System.out.println("---------------------------------------END_ERROR---------------------------------------");
             throw new AuthenticationCredentialsNotFoundException("Jwt was expired or invalid");
         }
+    }
+
+    private Claims parseClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
 }
