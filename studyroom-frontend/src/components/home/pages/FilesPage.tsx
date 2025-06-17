@@ -6,8 +6,12 @@ import apiClient from "../../../services/apiClient";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { selectCurrentUser } from "../../../features/userSlice";
+import FileViewerModal from "../../modal/FileViewerModal";
 
 const FilesPage = () => {
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<{ directory: string; filename: string } | null>(null);
+
   const [expandedDirs, setExpandedDirs] = useState<{ [key: string]: boolean }>(
     {}
   );
@@ -115,14 +119,18 @@ const FilesPage = () => {
       });
   };
 
+  // const handleView = (directory: string, fileName: string) => {
+  //   const encodedDirectory = encodeURIComponent(directory);
+  //   const encodedFileName = encodeURIComponent(fileName);
+
+  //   const viewUrl = `http://localhost:8080/file/view?directory=${encodedDirectory}&filename=${encodedFileName}`;
+  //   window.open(viewUrl, '_blank');
+  // };
+
   const handleView = (directory: string, fileName: string) => {
-    const encodedDirectory = encodeURIComponent(directory);
-    const encodedFileName = encodeURIComponent(fileName);
-
-    const viewUrl = `http://localhost:8080/file/view?directory=${encodedDirectory}&filename=${encodedFileName}`;
-    window.open(viewUrl, '_blank');
+    setSelectedFile({ directory, filename: fileName });
+    setViewerModalOpen(true);
   };
-
 
   const renderFiles = (files: any[]) => {
     const filteredFiles = filterFiles(files);
@@ -196,6 +204,14 @@ const FilesPage = () => {
             renderDirectory(fileSystemData[dirName], dirName)
           )}
       </div>
+      {selectedFile && (
+        <FileViewerModal
+          isOpen={viewerModalOpen}
+          onClose={() => setViewerModalOpen(false)}
+          directory={selectedFile.directory}
+          filename={selectedFile.filename}
+        />
+      )}
     </div>
   );
 };

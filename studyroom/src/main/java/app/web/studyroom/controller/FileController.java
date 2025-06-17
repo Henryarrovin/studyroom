@@ -3,12 +3,17 @@ package app.web.studyroom.controller;
 import app.web.studyroom.model.File;
 import app.web.studyroom.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -79,20 +84,58 @@ public class FileController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+//    @GetMapping("/view")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','STUDENT')")
+//    public ResponseEntity<byte[]> viewFile(
+//            @RequestParam("directory") String directory,
+//            @RequestParam("filename") String filename
+//    ) throws IOException {
+//        File file = fileService.downloadFiles(directory, filename);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.parseMediaType(file.getContentType()));
+//        headers.setContentDispositionFormData("inline", filename);
+//
+//        return new ResponseEntity<>(file.getData(), headers, HttpStatus.OK);
+
     @GetMapping("/view")
     @PreAuthorize("hasAnyAuthority('ADMIN','STUDENT')")
     public ResponseEntity<byte[]> viewFile(
             @RequestParam("directory") String directory,
             @RequestParam("filename") String filename
-    ) {
+    ) throws IOException {
         File file = fileService.downloadFiles(directory, filename);
 
+        if (file == null || file.getData() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null || contentType.isBlank()) {
+            contentType = getMimeTypeFromExtension(filename);
+        }
+
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(file.getContentType()));
-        headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
+        headers.setContentType(MediaType.parseMediaType(contentType));
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"");
 
         return new ResponseEntity<>(file.getData(), headers, HttpStatus.OK);
     }
 
+    private String getMimeTypeFromExtension(String filename) {
+        String ext = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+        return switch (ext) {
+            case "pdf" -> "application/pdf";
+            case "html", "htm" -> "text/html";
+            case "css" -> "text/css";
+            case "js" -> "application/javascript";
+            case "json" -> "application/json";
+            case "java", "txt", "md", "xml" -> "text/plain";
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "png" -> "image/png";
+            case "gif" -> "image/gif";
+            default -> "application/octet-stream";
+        };
+    }
 
 }
