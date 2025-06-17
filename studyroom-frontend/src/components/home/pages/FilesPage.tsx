@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react";
 import downloadIcon from "../../../assets/download.png";
 import deleteIcon from "../../../assets/delete.png";
+import viewIcon from "../../../assets/view.png";
 import apiClient from "../../../services/apiClient";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { selectCurrentUser } from "../../../features/userSlice";
+import FileViewerModal from "../../modal/FileViewerModal";
 
 const FilesPage = () => {
+  const [viewerModalOpen, setViewerModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<{ directory: string; filename: string } | null>(null);
+
   const [expandedDirs, setExpandedDirs] = useState<{ [key: string]: boolean }>(
     {}
   );
@@ -114,6 +119,19 @@ const FilesPage = () => {
       });
   };
 
+  // const handleView = (directory: string, fileName: string) => {
+  //   const encodedDirectory = encodeURIComponent(directory);
+  //   const encodedFileName = encodeURIComponent(fileName);
+
+  //   const viewUrl = `http://localhost:8080/file/view?directory=${encodedDirectory}&filename=${encodedFileName}`;
+  //   window.open(viewUrl, '_blank');
+  // };
+
+  const handleView = (directory: string, fileName: string) => {
+    setSelectedFile({ directory, filename: fileName });
+    setViewerModalOpen(true);
+  };
+
   const renderFiles = (files: any[]) => {
     const filteredFiles = filterFiles(files);
     return filteredFiles.map((file) => (
@@ -123,6 +141,12 @@ const FilesPage = () => {
       >
         📄 {file.filename}
         <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <button
+            onClick={() => handleView(file.directory, file.filename)}
+            className="p-1 hover:bg-gray-600 rounded-full"
+          >
+            <img src={viewIcon} alt="View" className="w-4 h-4" />
+          </button>
           <button
             onClick={() => handleDownload(file.directory, file.filename)}
             className="p-1 hover:bg-gray-600 rounded-full"
@@ -180,6 +204,14 @@ const FilesPage = () => {
             renderDirectory(fileSystemData[dirName], dirName)
           )}
       </div>
+      {selectedFile && (
+        <FileViewerModal
+          isOpen={viewerModalOpen}
+          onClose={() => setViewerModalOpen(false)}
+          directory={selectedFile.directory}
+          filename={selectedFile.filename}
+        />
+      )}
     </div>
   );
 };
