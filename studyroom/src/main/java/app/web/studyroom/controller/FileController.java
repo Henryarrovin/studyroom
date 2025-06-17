@@ -3,10 +3,7 @@ package app.web.studyroom.controller;
 import app.web.studyroom.model.File;
 import app.web.studyroom.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -81,5 +78,21 @@ public class FileController {
         fileService.deleteFile(directory, filename);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @GetMapping("/view")
+    @PreAuthorize("hasAnyAuthority('ADMIN','STUDENT')")
+    public ResponseEntity<byte[]> viewFile(
+            @RequestParam("directory") String directory,
+            @RequestParam("filename") String filename
+    ) {
+        File file = fileService.downloadFiles(directory, filename);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(file.getContentType()));
+        headers.setContentDisposition(ContentDisposition.inline().filename(file.getFilename()).build());
+
+        return new ResponseEntity<>(file.getData(), headers, HttpStatus.OK);
+    }
+
 
 }
