@@ -59,7 +59,7 @@ const FileViewerModal = ({ isOpen, onClose, directory, filename }: FileViewerMod
         const res = await fetch(fileUrl);
         const contentType = res.headers.get("Content-Type");
 
-        if (contentType && contentType.startsWith("text")) {
+        if (contentType && (contentType.startsWith("text") || contentType.includes("java"))) {
           const text = await res.text();
           setFileContent(text);
         } else if (contentType === "application/pdf") {
@@ -98,9 +98,10 @@ const FileViewerModal = ({ isOpen, onClose, directory, filename }: FileViewerMod
               src={fileUrl}
               className="w-full h-[80%] rounded-lg border border-gray-700"
               title="PDF Viewer"
+              onError={() => setFileContent("Unsupported")}
             />
           ) : fileContent === "Unsupported" ? (
-            <p className="text-red-400">This file type is not supported for inline viewing.</p>
+            <p className="text-red-400">This file type is not supported for inline viewing ... Please download!</p>
           ) : fileContent ? (
             <pre className="whitespace-pre-wrap text-sm bg-gray-800 p-4 rounded-lg border border-gray-700">
               {fileContent}
