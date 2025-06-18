@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -117,10 +115,27 @@ public class FileController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(contentType));
+        headers.set("Content-Length", String.valueOf(file.getData().length));
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"");
 
         return new ResponseEntity<>(file.getData(), headers, HttpStatus.OK);
     }
+
+//    private String getMimeTypeFromExtension(String filename) {
+//        String ext = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+//        return switch (ext) {
+//            case "pdf" -> "application/pdf";
+//            case "html", "htm" -> "text/html";
+//            case "css" -> "text/css";
+//            case "js" -> "application/javascript";
+//            case "json" -> "application/json";
+//            case "java", "txt", "md", "xml" -> "text/plain";
+//            case "jpg", "jpeg" -> "image/jpeg";
+//            case "png" -> "image/png";
+//            case "gif" -> "image/gif";
+//            default -> "application/octet-stream";
+//        };
+//    }
 
     private String getMimeTypeFromExtension(String filename) {
         String ext = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
@@ -130,10 +145,22 @@ public class FileController {
             case "css" -> "text/css";
             case "js" -> "application/javascript";
             case "json" -> "application/json";
-            case "java", "txt", "md", "xml" -> "text/plain";
+            case "java", "c", "cpp", "h", "hpp", "cs" -> "text/plain";
+            case "txt", "md", "xml", "log", "ini", "cfg" -> "text/plain";
             case "jpg", "jpeg" -> "image/jpeg";
             case "png" -> "image/png";
             case "gif" -> "image/gif";
+            case "svg" -> "image/svg+xml";
+            case "doc" -> "application/msword";
+            case "docx" -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            case "xls" -> "application/vnd.ms-excel";
+            case "xlsx" -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            case "ppt" -> "application/vnd.ms-powerpoint";
+            case "pptx" -> "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+            case "zip" -> "application/zip";
+            case "rar" -> "application/x-rar-compressed";
+            case "tar" -> "application/x-tar";
+            case "gz" -> "application/gzip";
             default -> "application/octet-stream";
         };
     }
