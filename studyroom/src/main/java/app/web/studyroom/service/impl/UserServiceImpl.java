@@ -22,11 +22,11 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
-    private JwtTokenProvider jwtTokenProvider;
-    private AuthenticationManager authenticationManager;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
     public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository,
                            JwtTokenProvider jwtTokenProvider, AuthenticationManager authenticationManager,
@@ -53,9 +53,7 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Role names must be provided");
         } else {
             List<Role> roles = roleNames.stream()
-                    .map(roleName -> roleRepository.findByName(roleName).orElseThrow(() -> {
-                        throw new RuntimeException("Role not found: " + roleName);
-                    }))
+                    .map(roleName -> roleRepository.findByName(roleName).orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
                     .collect(Collectors.toList());
             user.setRoles(roles);
         }
@@ -86,9 +84,7 @@ public class UserServiceImpl implements UserService {
                             roles -> {
                                 if (!roles.isEmpty()) {
                                     List<Role> updatedRoles = roles.stream()
-                                            .map(role -> roleRepository.findByName(role.getName()).orElseThrow(() -> {
-                                                throw new RuntimeException("Role not found: " + role.getName());
-                                            }))
+                                            .map(role -> roleRepository.findByName(role.getName()).orElseThrow(() -> new RuntimeException("Role not found: " + role.getName())))
                                             .collect(Collectors.toList());
                                     existingUser.setRoles(updatedRoles);
                                 }
@@ -117,9 +113,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> {
-            throw new RuntimeException("User not found: " + username);
-        });
+        return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found: " + username));
     }
 
     @Override

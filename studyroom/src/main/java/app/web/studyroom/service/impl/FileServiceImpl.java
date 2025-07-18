@@ -9,10 +9,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -24,7 +21,7 @@ public class FileServiceImpl implements FileService {
     public List<String> uploadFiles(String directory, List<MultipartFile> multipartFiles) throws IOException {
         List<String> filenames = new ArrayList<>();
         for (MultipartFile file : multipartFiles) {
-            String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
+            String originalFilename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
             String filename = originalFilename;
             int count = 1;
 
