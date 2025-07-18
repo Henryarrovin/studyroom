@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine
+FROM openjdk:24-jdk
 LABEL authors="Henry"
 
 ARG JAR_FILE=target/*.jar
